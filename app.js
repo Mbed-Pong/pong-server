@@ -1,7 +1,7 @@
 require('dotenv').config();
 const dgram = require('dgram');
 const server = dgram.createSocket('udp4');
-const hostname = '127.0.0.1';
+// const hostname = '127.0.0.1';
 const port = process.env.PORT;
 const { GameState } = require('./game.js');
 const { findAvailableLobby } = require('./matchMaking.js');
@@ -10,7 +10,7 @@ var MAX_LOBBIES = 5;
 let lobbies = new Map();
 
 server.on('error', (err) => {
-  console.log(`server error:\n${err.stack}`)
+  console.log(`server error:\n${err.stack}`);
 });
 
 server.on('connect', () => {
@@ -23,7 +23,7 @@ server.on('close', () => {
 });
 
 server.on('message', (msg, rinfo) => {
-  console.log(msg);
+  console.log(msg.toString());
   const json = JSON.parse(msg);
 
   switch (json.type) {
@@ -63,4 +63,4 @@ server.on('listening', () => {
 // const handler = setInterval(() => { }, TICK_TIME)
 // clearInterval(handler)
 
-server.bind(port, hostname);
+server.bind(port);
