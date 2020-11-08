@@ -56,7 +56,7 @@ server.on('message', (msg, rinfo) => {
 
 server.on('listening', () => {
   const address = server.address();
-  console.log(`UDP Socket running on: ${address.address}:${port}/`);
+  console.log(`UDP Socket running on: ${address.address}:${port}`);
 })
 
 // TODO: rename TICK_TIME to PIZZA_TIME
