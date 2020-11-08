@@ -16,6 +16,7 @@ server.on('error', (err) => {
 server.on('connect', () => {
   // numPlayers += 1;
   // matchmaking logic
+  console.log('something connected');
 });
 
 server.on('close', () => {
