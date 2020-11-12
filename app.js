@@ -25,33 +25,36 @@ server.on('close', () => {
 
 server.on('message', (msg, rinfo) => {
   console.log(msg.toString());
-  const json = JSON.parse(msg);
-
-  switch (json.type) {
-    case 'connected':
-      let found = findAvailableLobby(lobbies);
-      if (found === null) {
-        if (lobbies.size >= MAX_LOBBIES) {
-          // respond that lobbies are full
+  try {
+    const json = JSON.parse(msg);
+    switch (json.type) {
+      case 'connected':
+        let found = findAvailableLobby(lobbies);
+        if (found === null) {
+          if (lobbies.size >= MAX_LOBBIES) {
+            // respond that lobbies are full
+          } else {
+            // create new lobby and hash
+            let hash = "jaredyaegersflipflop";
+            lobbies.set(hash, { net: [{ addr: rinfo.address, port: rinfo.port }], gameState: new GameState(128, 128) });
+            server.send('eyyyyyy bal', rinfo.port, rinfo.address);
+          }
         } else {
-          // create new lobby and hash
-          let hash = "jaredyaegersflipflop";
-          lobbies.set(hash, { net: [{ addr: rinfo.address, port: rinfo.port }], gameState: new GameState(128, 128) });
-          server.send('eyyyyyy bal', rinfo.port, rinfo.address);
-        }
-      } else {
-        let lobby = lobbies[found];
-        lobby.numPlayers++;
-        lobby.net[1] = { addr: rinfo.address, port: rinfo.port };
-        // send hash to players when ready
-        if (lobby.numPlayers === 2) {
-          // start game and send gamestate to both players 
+          let lobby = lobbies[found];
+          lobby.numPlayers++;
+          lobby.net[1] = { addr: rinfo.address, port: rinfo.port };
+          // send hash to players when ready
+          if (lobby.numPlayers === 2) {
+            // start game and send gamestate to both players 
 
+          }
         }
-      }
-      break;
-    case 'move':
-      break;
+        break;
+      case 'move':
+        break;
+    }
+  } catch (e) {
+    console.log(e);
   }
 });
 
