@@ -3,25 +3,28 @@
 const clampNumber = (num, min, max) => (Math.max(Math.min(num, max), min));
 
 /**
- * creates a game state that can be broadcast to connected devices. 
- * @param {*} x horizontal dimension of the board 
- * @param {*} y vertical dimension of the board 
- * @param {*} pointsToWin points to win game
+ * Game state class that handles the game state
  */
-
 class GameState {
   #ballSpeed = .2;
+  #ballDir;
   #x;
   #y;
   #pointsToWin;
 
+  /**
+   * creates a game state that can be broadcast to connected devices. 
+   * @param {number} x horizontal dimension of the board 
+   * @param {number} y vertical dimension of the board 
+   * @param {number} pointsToWin points to win game
+   */
   constructor(x, y, pointsToWin) {
     this.#x = x;
     this.#y = y;
     this.#pointsToWin = pointsToWin || 5;
     this.playerOnePos = y / 2 - 1; // y / 2 - 1
     this.playerTwoPos = x / 2 - 1;
-    this.ballDir = [1, 0];
+    this.#ballDir = [1, 0];
     this.ballPos = [x / 2 - 1, y / 2 - 1];
     this.score = [0, 0];
     this.isOver = 0; // 1 for player 1 victory 2 for player 2 victory 3 for other/disconnect
@@ -36,19 +39,28 @@ class GameState {
   // }
 
   /**
+   * called when game ends
    * @param {() => void} onEnd
    */
   set onEnd(onEnd) {
     this.onEnd = onEnd;
   }
 
-  end() {
+  /**
+   * called at the end of a tick cycle
+   * @param {() => void} onTickForward
+   */
+  set onTickForward(onTickForward) {
+    this.onTickForward = onTickForward;
+  }
+
+  #end() {
     this.onEnd();
   }
 
   /**
    * 
-   */ 
+   */
   update(player, move) {
     // respond to player move
     // probably want to change these to reflect the size of the paddles
@@ -60,10 +72,10 @@ class GameState {
     }
   }
 
-  tickForward () {
+  tickForward() {
     // console.log("hello world")
     // move the ball
-    this.ballPos = this.ballDir.map((component, index) => {
+    this.ballPos = this.#ballDir.map((component, index) => {
       this.ballPos[index] + component * this.#ballSpeed;
     })
     // player 2 scores
@@ -79,8 +91,12 @@ class GameState {
     // check for winner
     if (Math.max(this.score) >= this.#pointsToWin) {
       this.isOver = this.score.indexOf(Math.max(this.score)) + 1;
-      this.end();
     }
+    // check for game over
+    if (isOver) {
+      this.#end();
+    }
+    this.onTickForward();
     console.log(JSON.stringify(this));
   };
 
@@ -88,7 +104,7 @@ class GameState {
 
 // export default { GameState }
 
-module.exports.GameState = GameState; 
+module.exports.GameState = GameState;
 // JSON.stringify(gameState)
 
 

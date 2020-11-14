@@ -7,6 +7,7 @@ const { findAvailableLobby } = require('./matchMaking.js');
 
 const MAX_LOBBIES = 5;
 const TICK_TIME = 20;
+
 let lobbies = new Map();
 
 server.on('error', (err) => {
@@ -14,13 +15,10 @@ server.on('error', (err) => {
 });
 
 server.on('connect', () => {
-  // numPlayers += 1;
-  // matchmaking logic
   console.log('something connected');
 });
 
 server.on('close', () => {
-  // numPlayers -= 1;
 });
 
 server.on('message', (msg, rinfo) => {
@@ -37,18 +35,24 @@ server.on('message', (msg, rinfo) => {
             // create new lobby and hash
             let hash = "jaredyaegersflipflop";
             lobbies.set(hash, { net: [{ addr: rinfo.address, port: rinfo.port }], gameState: new GameState(128, 128, 5) });
-            server.send(JSON.stringify(lobbies.get(hash).gameState), rinfo.port, rinfo.address);
+            server.send(JSON.stringify({ type: 'connected', player: 0, hash: hash }), rinfo.port, rinfo.address);
           }
         } else {
           let lobby = lobbies.get(found);
           lobby.numPlayers++;
           lobby.net[1] = { addr: rinfo.address, port: rinfo.port };
           // send hash to players when ready
+          server.send(JSON.stringify({ type: 'connected', player: 1, hash: found }), rinfo.port, rinfo.address);
           if (lobby.numPlayers === 2) {
             // start game and send gamestate to both players
             // need to come up with a way to clear the interval
-            lobby.handle = setInterval(() => {lobby.gameState.tickForward}, TICK_TIME);
-            lobby.gameState.onEnd = () => {clearInterval(lobby.handle)}
+            lobby.gameState.onTickForward = () => {
+              lobby.net.map((netinfo) => {
+                server.send(JSON.stringify(lobby.gameState), netinfo.port, netinfo.addr);
+              })
+            }
+            lobby.ticker = setInterval(() => { lobby.gameState.tickForward }, TICK_TIME);
+            lobby.gameState.onEnd = () => { clearInterval(lobby.ticker) };
           }
         }
         break;
@@ -66,9 +70,5 @@ server.on('listening', () => {
   const address = server.address();
   console.log(`UDP Socket running on: ${address.address}:${port}`);
 })
-
-// TODO: rename TICK_TIME to PIZZA_TIME
-// const handler = setInterval(() => { }, TICK_TIME)
-// clearInterval(handler)
 
 server.bind(port);
