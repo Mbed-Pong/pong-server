@@ -36,6 +36,17 @@ class GameState {
   // }
 
   /**
+   * @param {() => void} onEnd
+   */
+  set onEnd(onEnd) {
+    this.onEnd = onEnd;
+  }
+
+  end() {
+    this.onEnd();
+  }
+
+  /**
    * 
    */ 
   update(player, move) {
@@ -68,6 +79,7 @@ class GameState {
     // check for winner
     if (Math.max(this.score) >= this.#pointsToWin) {
       this.isOver = this.score.indexOf(Math.max(this.score)) + 1;
+      this.end();
     }
     console.log(JSON.stringify(this));
   };

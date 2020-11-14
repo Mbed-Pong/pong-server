@@ -37,17 +37,18 @@ server.on('message', (msg, rinfo) => {
             // create new lobby and hash
             let hash = "jaredyaegersflipflop";
             lobbies.set(hash, { net: [{ addr: rinfo.address, port: rinfo.port }], gameState: new GameState(128, 128, 5) });
-            server.send('eyyyyyy bal', rinfo.port, rinfo.address);
+            server.send(JSON.stringify(lobbies.get(hash).gameState), rinfo.port, rinfo.address);
           }
         } else {
-          let lobby = lobbies[found];
+          let lobby = lobbies.get(found);
           lobby.numPlayers++;
           lobby.net[1] = { addr: rinfo.address, port: rinfo.port };
           // send hash to players when ready
           if (lobby.numPlayers === 2) {
             // start game and send gamestate to both players
             // need to come up with a way to clear the interval
-            // lobby.handler = setInterval(() => {lobby.gameState.tickForward}, TICK_TIME);
+            lobby.handle = setInterval(() => {lobby.gameState.tickForward}, TICK_TIME);
+            lobby.gameState.onEnd = () => {clearInterval(lobby.handle)}
           }
         }
         break;
