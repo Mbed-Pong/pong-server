@@ -24,6 +24,9 @@ export class GameState {
   playerTwoPos: number;
   isOver: number;
 
+  onEnd: () => void;
+  onTickForward: () => void;
+
   /**
    * creates a game state that can be broadcast to connected devices. 
    * @param options see type `GameStateOptions`
@@ -40,6 +43,8 @@ export class GameState {
     this.ballPos = [options.width / 2 - 1, options.height / 2 - 1];
     this.score = [0, 0];
     this.isOver = 0; // 1 for player 1 victory 2 for player 2 victory 3 for other/disconnect
+    this.onEnd = () => {};
+    this.onTickForward = () => {};
   };
 
   private resetBall() {
@@ -50,21 +55,21 @@ export class GameState {
   //   return this.score[0] >= 3 || this.score[1] >= 3;
   // }
 
-  /**
-   * called when game ends
-   * @param {() => void} onEnd
-   */
-  set onEnd(callback: () => void) {
-    this.onEnd = () => callback;
-  }
+  // /**
+  //  * called when game ends
+  //  * @param {() => void} onEnd
+  //  */
+  // set onEnd(callback: () => void) {
+  //   this.onEnd = () => callback;
+  // }
 
-  /**
-   * called at the end of a tick cycle
-   * @param {() => void} onTickForward
-   */
-  set onTickForward(callback: () => void) {
-    this.onTickForward = () => callback;
-  }
+  // /**
+  //  * called at the end of a tick cycle
+  //  * @param {() => void} onTickForward
+  //  */
+  // set onTickForward(callback: () => void) {
+  //   this.onTickForward = () => callback;
+  // }
 
   /**
    * 
@@ -103,8 +108,9 @@ export class GameState {
     // check for game over
     if (this.isOver) {
       this.onEnd();
+    } else {
+      this.onTickForward();
     }
-    this.onTickForward();
     console.log(JSON.stringify(this));
   };
 

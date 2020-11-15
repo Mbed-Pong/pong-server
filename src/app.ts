@@ -77,7 +77,7 @@ server.on('message', (msg, rinfo) => {
               })
             };
             console.log('setting ticker...');
-            lobby.ticker = setInterval(() => { lobby && lobby.gameState.tickForward }, TICK_TIME);
+            lobby.ticker = setInterval(() => { lobby && lobby.gameState.tickForward() }, TICK_TIME);
             console.log('setting onEnd...');
             lobby.gameState.onEnd = () => { lobby?.ticker && clearInterval(lobby.ticker) };
           }
