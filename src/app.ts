@@ -54,6 +54,7 @@ server.on('message', (msg, rinfo) => {
         } else {
           let lobby = lobbies.get(found);
           if (!lobby) {
+            console.log('lobby does not exist')
             // lobby doesn't exist
             return;
           }
@@ -64,14 +65,20 @@ server.on('message', (msg, rinfo) => {
           if (lobby.numPlayers === 2) {
             // start game and send gamestate to both players
             // need to come up with a way to clear the interval
+            console.log('setting onTickForward()...');
             lobby.gameState.onTickForward = () => {
               lobby && lobby.net.map((netinfo, player) => {
-                if (lobby === undefined) return;
+                if (lobby === undefined) {
+                  console.log('lobby is undefined');
+                  return;
+                }
                 server.send(JSON.stringify({type: 'gameState', gameState: lobby.gameState}), netinfo.port, netinfo.addr);
                 console.log("Sending game state to player " + player);
               })
-            }
+            };
+            console.log('setting ticker...');
             lobby.ticker = setInterval(() => { lobby && lobby.gameState.tickForward }, TICK_TIME);
+            console.log('setting onEnd...');
             lobby.gameState.onEnd = () => { lobby?.ticker && clearInterval(lobby.ticker) };
           }
         }

@@ -54,16 +54,16 @@ export class GameState {
    * called when game ends
    * @param {() => void} onEnd
    */
-  set onEnd(onEnd: () => void) {
-    this.onEnd = onEnd;
+  set onEnd(callback: () => void) {
+    this.onEnd = () => callback;
   }
 
   /**
    * called at the end of a tick cycle
    * @param {() => void} onTickForward
    */
-  set onTickForward(onTickForward: () => void) {
-    this.onTickForward = onTickForward;
+  set onTickForward(callback: () => void) {
+    this.onTickForward = () => callback;
   }
 
   /**
