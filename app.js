@@ -47,8 +47,9 @@ server.on('message', (msg, rinfo) => {
             // start game and send gamestate to both players
             // need to come up with a way to clear the interval
             lobby.gameState.onTickForward = () => {
-              lobby.net.map((netinfo) => {
+              lobby.net.map((netinfo, player) => {
                 server.send(JSON.stringify(lobby.gameState), netinfo.port, netinfo.addr);
+                console.log("Sending game state to player " + player);
               })
             }
             lobby.ticker = setInterval(() => { lobby.gameState.tickForward }, TICK_TIME);

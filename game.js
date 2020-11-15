@@ -24,6 +24,7 @@ class GameState {
     this.#pointsToWin = pointsToWin || 5;
     this.playerOnePos = y / 2 - 1; // y / 2 - 1
     this.playerTwoPos = x / 2 - 1;
+    // randomnize
     this.#ballDir = [1, 0];
     this.ballPos = [x / 2 - 1, y / 2 - 1];
     this.score = [0, 0];
@@ -78,6 +79,7 @@ class GameState {
     this.ballPos = this.#ballDir.map((component, index) => {
       this.ballPos[index] + component * this.#ballSpeed;
     })
+    // check for paddle hit
     // player 2 scores
     if (ballPos[0] <= 0) {
       this.score[1]++;
