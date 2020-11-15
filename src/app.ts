@@ -1,14 +1,24 @@
 require('dotenv').config();
-const dgram = require('dgram');
+import dgram from 'dgram';
+import { GameState } from './game';
+import { findAvailableLobby, Lobby } from './matchMaking';
+
 const server = dgram.createSocket('udp4');
 const port = process.env.PORT;
-const { GameState } = require('./game.js');
-const { findAvailableLobby } = require('./matchMaking.js');
 
 const MAX_LOBBIES = 5;
 const TICK_TIME = 20;
 
-let lobbies = new Map();
+let lobbies:Map<string, Lobby> = new Map();
+
+type Message = {
+  type: 'connected';
+} | {
+  type: 'move';
+  hash: string;
+  player: 0 | 1;
+  delta: number;
+}
 
 server.on('error', (err) => {
   console.log(`server error:\n${err.stack}`);
@@ -24,7 +34,7 @@ server.on('close', () => {
 server.on('message', (msg, rinfo) => {
   console.log(msg.toString());
   try {
-    const json = JSON.parse(msg);
+    const json: Message = JSON.parse(msg.toString());
     switch (json.type) {
       case 'connected':
         let found = findAvailableLobby(lobbies);
@@ -34,11 +44,19 @@ server.on('message', (msg, rinfo) => {
           } else {
             // create new lobby and hash
             let hash = "jaredyaegersflipflop";
-            lobbies.set(hash, { net: [{ addr: rinfo.address, port: rinfo.port }], gameState: new GameState(128, 128, 5) });
+            lobbies.set(hash, { 
+              numPlayers: 1, 
+              net: [{ addr: rinfo.address, port: rinfo.port }], 
+              gameState: new GameState({height: 128, width: 128, pointsToWin: 5}),
+            });
             server.send(JSON.stringify({ type: 'connected', player: 0, hash: hash }), rinfo.port, rinfo.address);
           }
         } else {
           let lobby = lobbies.get(found);
+          if (!lobby) {
+            // lobby doesn't exist
+            return;
+          }
           lobby.numPlayers++;
           lobby.net[1] = { addr: rinfo.address, port: rinfo.port };
           // send hash to players when ready
@@ -47,18 +65,20 @@ server.on('message', (msg, rinfo) => {
             // start game and send gamestate to both players
             // need to come up with a way to clear the interval
             lobby.gameState.onTickForward = () => {
-              lobby.net.map((netinfo, player) => {
-                server.send(JSON.stringify(lobby.gameState), netinfo.port, netinfo.addr);
+              lobby && lobby.net.map((netinfo, player) => {
+                if (lobby === undefined) return;
+                server.send(JSON.stringify({type: 'gameState', gameState: lobby.gameState}), netinfo.port, netinfo.addr);
                 console.log("Sending game state to player " + player);
               })
             }
-            lobby.ticker = setInterval(() => { lobby.gameState.tickForward }, TICK_TIME);
-            lobby.gameState.onEnd = () => { clearInterval(lobby.ticker) };
+            lobby.ticker = setInterval(() => { lobby && lobby.gameState.tickForward }, TICK_TIME);
+            lobby.gameState.onEnd = () => { lobby?.ticker && clearInterval(lobby.ticker) };
           }
         }
         break;
       case 'move':
         let lobby = lobbies.get(json.hash);
+        if (lobby === undefined) return;
         lobby.gameState.update(json.player, json.delta);
         break;
     }
@@ -72,4 +92,4 @@ server.on('listening', () => {
   console.log(`UDP Socket running on: ${address.address}:${port}`);
 })
 
-server.bind(port);
+port && server.bind(Number(port));
