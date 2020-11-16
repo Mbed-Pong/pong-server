@@ -1,5 +1,10 @@
 const clampNumber = (num: number, min: number, max: number) => (Math.max(Math.min(num, max), min));
 
+// enum State {
+//   HORIZONTAL=0,
+//   VERTICAL=1,
+// }
+
 type GameStateOptions = {
   height: number;
   width: number;
@@ -14,6 +19,7 @@ export class GameState {
   // private
   #ballSpeed: number;
   #ballDir: [number, number];
+  #ballPosActual: [number, number];
   #x: number;
   #y: number;
   #pointsToWin: number;
@@ -23,8 +29,14 @@ export class GameState {
   playerOnePos: number;
   playerTwoPos: number;
   isOver: number;
-
+  // callbacks
+  /**
+   * called when game ends
+   */
   onEnd: () => void;
+  /**
+   * called at the end of a game tick
+   */
   onTickForward: () => void;
 
   /**
@@ -40,36 +52,33 @@ export class GameState {
     // randomnize
     this.#ballSpeed = options.ballSpeed || .2;
     this.#ballDir = [1, 0];
+    this.#ballPosActual = [options.width / 2 - 1, options.height / 2 - 1];
     this.ballPos = [options.width / 2 - 1, options.height / 2 - 1];
     this.score = [0, 0];
-    this.isOver = 0; // 1 for player 1 victory 2 for player 2 victory 3 for other/disconnect
-    this.onEnd = () => {};
-    this.onTickForward = () => {};
+    this.isOver = 0;
+    this.onEnd = () => { };
+    this.onTickForward = () => { };
   };
 
-  private resetBall() {
-    this.ballPos = [this.#x / 2 - 1, this.#y / 2 - 1]
+  private set ballPosActual(position: [number, number]) {
+    this.#ballPosActual = position;
+    this.ballPos = [Math.round(position[0]), Math.round(position[1])]
   }
 
-  // get isOver() {
-  //   return this.score[0] >= 3 || this.score[1] >= 3;
-  // }
+  private resetBall() {
+    this.ballPos = [this.#x / 2 - 1, this.#y / 2 - 1];
+    this.randomnizeDir(180);
+  }
 
-  // /**
-  //  * called when game ends
-  //  * @param {() => void} onEnd
-  //  */
-  // set onEnd(callback: () => void) {
-  //   this.onEnd = () => callback;
-  // }
+  private randomnizeDir(range: number) {
+    let currAngle = Math.atan2(this.#ballDir[1], this.#ballDir[0]) * 180 / Math.PI;
+    let randAngle = (Math.floor(Math.random() * (currAngle + 2 * range + 1)) - range) * Math.PI / 180;
+    this.#ballDir = [Math.cos(randAngle), Math.sin(randAngle)];
+  }
 
-  // /**
-  //  * called at the end of a tick cycle
-  //  * @param {() => void} onTickForward
-  //  */
-  // set onTickForward(callback: () => void) {
-  //   this.onTickForward = () => callback;
-  // }
+  private bounceDir() {
+
+  }
 
   /**
    * 
@@ -85,11 +94,13 @@ export class GameState {
     }
   }
 
+  /**
+   * 
+   */
   tickForward() {
     // console.log("hello world")
     // move the ball
-    this.ballPos[0] += this.#ballDir[0] * this.#ballSpeed;
-    this.ballPos[1] += this.#ballDir[1] * this.#ballSpeed;
+    this.ballPosActual = [this.#ballPosActual[0] + this.#ballDir[0] * this.#ballSpeed, this.#ballPosActual[1] + this.#ballDir[1] * this.#ballSpeed];
     // check for paddle hit
     // player 2 scores
     if (this.ballPos[0] <= 0) {
