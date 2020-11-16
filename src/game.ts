@@ -109,7 +109,7 @@ export class GameState {
   private bounceDir(axis: 'horiz' | 'vert') {
     if (axis === 'horiz') {
       this.#ballDir = [this.#ballDir[0], -1 * this.#ballDir[1]];
-      this.randomnizeDir(10);
+      // this.randomnizeDir(10);
     } else {
       this.#ballDir = [-1 * this.#ballDir[0], this.#ballDir[1]];
     }
@@ -157,8 +157,8 @@ export class GameState {
     }
 
     // player 2
-    if (this.#ballPosActual[1] > this.#y - 1 - this.#paddleElevation &&
-      this.#ballPosActual[1] < this.#y - 1 - this.#paddleElevation - 2) {
+    if (this.#ballPosActual[1] < this.#y - 1 - this.#paddleElevation &&
+      this.#ballPosActual[1] > this.#y - 1 - this.#paddleElevation - 2) {
       if (this.#ballPosActual[0] >= this.playerTwoPos - this.#paddleReach &&
         this.#ballPosActual[0] <= this.playerTwoPos + this.#paddleReach) {
         this.bounceDir('horiz')
