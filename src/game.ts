@@ -77,9 +77,9 @@ export class GameState {
 
   private bounceDir(axis: 'horiz' | 'vert') {
     if (axis === 'horiz') {
-      this.ballPosActual = [this.#ballPosActual[0], -1 * this.#ballPosActual[1]];
+      this.#ballDir = [this.#ballDir[0], -1 * this.#ballDir[1]];
     } else {
-      this.ballPosActual = [-1 * this.#ballPosActual[0], this.#ballPosActual[1]];
+      this.#ballDir = [-1 * this.#ballDir[0], this.#ballDir[1]];
     }
   }
 
