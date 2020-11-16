@@ -66,7 +66,7 @@ export class GameState {
   }
 
   private resetBall() {
-    this.ballPos = [this.#x / 2 - 1, this.#y / 2 - 1];
+    this.ballPosActual = [this.#x / 2 - 1, this.#y / 2 - 1];
     this.randomnizeDir(180);
   }
 
