@@ -6,10 +6,35 @@ const clampNumber = (num: number, min: number, max: number) => (Math.max(Math.mi
 // }
 
 type GameStateOptions = {
+  /**
+   * height of the gameboard
+   */
   height: number;
+
+  /**
+   * width of the gameboard
+   */
   width: number;
+
+  /**
+   * points required for game over
+   */
   pointsToWin?: number;
+
+  /**
+   * ball speed
+   */
   ballSpeed?: number;
+
+  /**
+   * size of the paddles (in pixels) should be odd
+   */
+  paddleSize?: number;
+
+  /**
+   * how far the paddles are from the goals (in pixels)
+   */
+  paddleElevation?: number;
 }
 
 /**
@@ -23,6 +48,8 @@ export class GameState {
   #x: number;
   #y: number;
   #pointsToWin: number;
+  #paddleReach: number;
+  #paddleElevation: number;
   // public
   ballPos: [number, number];
   score: [number, number];
@@ -47,14 +74,18 @@ export class GameState {
     this.#x = options.width;
     this.#y = options.height;
     this.#pointsToWin = options.pointsToWin || 5;
-    this.playerOnePos = options.height / 2 - 1;
-    this.playerTwoPos = options.height / 2 - 1;
-    this.#ballSpeed = options.ballSpeed || .4;
+    this.#ballSpeed = options.ballSpeed || .3;
     this.#ballDir = [1, 0];
     this.#ballPosActual = [options.width / 2 - 1, options.height / 2 - 1];
+    this.#paddleReach = options.paddleSize ? Math.floor(options.paddleSize / 2) : 15;
+    this.#paddleElevation = options.paddleElevation || 5;
+
+    this.playerOnePos = options.height / 2 - 1;
+    this.playerTwoPos = options.height / 2 - 1;
     this.ballPos = [options.width / 2 - 1, options.height / 2 - 1];
     this.score = [0, 0];
     this.isOver = 0;
+
     this.onEnd = () => { };
     this.onTickForward = () => { };
   };
@@ -78,50 +109,79 @@ export class GameState {
   private bounceDir(axis: 'horiz' | 'vert') {
     if (axis === 'horiz') {
       this.#ballDir = [this.#ballDir[0], -1 * this.#ballDir[1]];
+      this.randomnizeDir(10);
     } else {
       this.#ballDir = [-1 * this.#ballDir[0], this.#ballDir[1]];
     }
   }
 
   /**
-   * 
+   * updates player positions
    */
   update(player: 0 | 1, move: number) {
     // respond to player move
     // probably want to change these to reflect the size of the paddles
     if (player === 0) {
-      this.playerOnePos = clampNumber(this.playerOnePos + move, 0, this.#y - 1);
+      if (this.playerOnePos + move - this.#paddleReach >= 0 && this.playerOnePos + move + this.#paddleReach <= this.#x - 1) {
+        this.playerOnePos += move;
+      }
     }
     if (player === 1) {
-      this.playerTwoPos = clampNumber(this.playerTwoPos + move, 0, this.#y - 1);
+      if (this.playerTwoPos + move - this.#paddleReach >= 0 && this.playerTwoPos + move + this.#paddleReach <= this.#x - 1) {
+        this.playerTwoPos += move;
+      }
     }
   }
 
   /**
-   * 
+   * ticks the game forward
    */
   tickForward() {
     // console.log("hello world")
     // move the ball
     this.ballPosActual = [this.#ballPosActual[0] + this.#ballDir[0] * this.#ballSpeed, this.#ballPosActual[1] + this.#ballDir[1] * this.#ballSpeed];
-    // check for bounce
-    if (this.#ballPosActual[1] <= 0 || this.#ballPosActual[1] >= this.#y - 1) {
-      this.bounceDir('horiz');
+
+    // check for wall bounce
+    if (this.#ballPosActual[0] <= 0 || this.#ballPosActual[0] >= this.#x - 1) {
+      this.bounceDir('vert');
     }
+
+    // check for paddle bounce
+    // player 1
+    if (this.#ballPosActual[1] > this.#paddleElevation &&
+      this.#ballPosActual[1] < this.#paddleElevation + 2) {
+      if (this.#ballPosActual[0] >= this.playerOnePos - this.#paddleReach &&
+        this.#ballPosActual[0] <= this.playerOnePos + this.#paddleReach) {
+        this.bounceDir('horiz')
+      }
+    }
+
+    // player 2
+    if (this.#ballPosActual[1] > this.#y - 1 - this.#paddleElevation &&
+      this.#ballPosActual[1] < this.#y - 1 - this.#paddleElevation - 2) {
+      if (this.#ballPosActual[0] >= this.playerTwoPos - this.#paddleReach &&
+        this.#ballPosActual[0] <= this.playerTwoPos + this.#paddleReach) {
+        this.bounceDir('horiz')
+      }
+    }
+
     // player 2 scores
-    if (this.#ballPosActual[0] <= 0) {
+    if (this.#ballPosActual[1] <= 0) {
       this.score[1]++;
       this.resetBall();
     }
+
     // player 1 scores
-    if (this.#ballPosActual[0] >= this.#x - 1) {
+    if (this.#ballPosActual[1] >= this.#y - 1) {
       this.score[0]++;
       this.resetBall();
     }
+
     // check for winner
     if (Math.max(...this.score) >= this.#pointsToWin) {
       this.isOver = this.score.indexOf(Math.max(...this.score)) + 1;
     }
+
     // check for game over
     if (this.isOver) {
       this.onEnd();
