@@ -7,7 +7,7 @@ const server = dgram.createSocket('udp4');
 const port = process.env.PORT;
 
 const MAX_LOBBIES = 5;
-const TICK_TIME = 50;
+const TICK_TIME = 20;
 
 let lobbies:Map<string, Lobby> = new Map();
 
