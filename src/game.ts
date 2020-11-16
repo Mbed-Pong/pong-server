@@ -75,7 +75,7 @@ export class GameState {
     this.#y = options.height;
     this.#pointsToWin = options.pointsToWin || 5;
     this.#ballSpeed = options.ballSpeed || .3;
-    this.#ballDir = [1, 0];
+    this.#ballDir = [0, 1];
     this.#ballPosActual = [options.width / 2 - 1, options.height / 2 - 1];
     this.#paddleReach = options.paddleSize ? Math.floor(options.paddleSize / 2) : 15;
     this.#paddleElevation = options.paddleElevation || 5;
