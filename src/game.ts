@@ -47,10 +47,9 @@ export class GameState {
     this.#x = options.width;
     this.#y = options.height;
     this.#pointsToWin = options.pointsToWin || 5;
-    this.playerOnePos = options.height / 2 - 1; // y / 2 - 1
+    this.playerOnePos = options.height / 2 - 1;
     this.playerTwoPos = options.height / 2 - 1;
-    // randomnize
-    this.#ballSpeed = options.ballSpeed || .2;
+    this.#ballSpeed = options.ballSpeed || .4;
     this.#ballDir = [1, 0];
     this.#ballPosActual = [options.width / 2 - 1, options.height / 2 - 1];
     this.ballPos = [options.width / 2 - 1, options.height / 2 - 1];
@@ -76,8 +75,12 @@ export class GameState {
     this.#ballDir = [Math.cos(randAngle), Math.sin(randAngle)];
   }
 
-  private bounceDir() {
-
+  private bounceDir(axis: 'horiz' | 'vert') {
+    if (axis === 'horiz') {
+      this.ballPosActual = [this.#ballPosActual[0], -1 * this.#ballPosActual[1]];
+    } else {
+      this.ballPosActual = [-1 * this.#ballPosActual[0], this.#ballPosActual[1]];
+    }
   }
 
   /**
@@ -101,14 +104,17 @@ export class GameState {
     // console.log("hello world")
     // move the ball
     this.ballPosActual = [this.#ballPosActual[0] + this.#ballDir[0] * this.#ballSpeed, this.#ballPosActual[1] + this.#ballDir[1] * this.#ballSpeed];
-    // check for paddle hit
+    // check for bounce
+    if (this.#ballPosActual[1] <= 0 || this.#ballPosActual[1] >= this.#y - 1) {
+      this.bounceDir('horiz');
+    }
     // player 2 scores
-    if (this.ballPos[0] <= 0) {
+    if (this.#ballPosActual[0] <= 0) {
       this.score[1]++;
       this.resetBall();
     }
     // player 1 scores
-    if (this.ballPos[0] >= this.#x - 1) {
+    if (this.#ballPosActual[0] >= this.#x - 1) {
       this.score[0]++;
       this.resetBall();
     }
