@@ -43,7 +43,7 @@ server.on('message', (msg, rinfo) => {
             // respond that lobbies are full
           } else {
             // create new lobby and hash
-            let hash = "jaredyaegersflipflop";
+            let hash = "jaredyeagersflipflop";
             lobbies.set(hash, { 
               numPlayers: 1, 
               net: [{ addr: rinfo.address, port: rinfo.port }], 
@@ -73,7 +73,7 @@ server.on('message', (msg, rinfo) => {
                   return;
                 }
                 server.send(JSON.stringify({type: 'gameState', gameState: lobby.gameState}), netinfo.port, netinfo.addr);
-                console.log("Sending game state to player " + player);
+                // console.log("Sending game state to player " + player);
               })
             };
             console.log('setting ticker...');
@@ -90,7 +90,7 @@ server.on('message', (msg, rinfo) => {
           return;
         }
         lobby.gameState.update(json.player, json.delta);
-        console.log('updated positions');
+        // console.log('updated positions');
         break;
     }
   } catch (e) {

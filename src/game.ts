@@ -74,7 +74,7 @@ export class GameState {
     this.#x = options.width;
     this.#y = options.height;
     this.#pointsToWin = options.pointsToWin || 5;
-    this.#ballSpeed = options.ballSpeed || .3;
+    this.#ballSpeed = options.ballSpeed || .8;
     this.#ballDir = [0, 1];
     this.#ballPosActual = [options.width / 2 - 1, options.height / 2 - 1];
     this.#paddleReach = options.paddleSize ? Math.floor(options.paddleSize / 2) : 15;
@@ -121,7 +121,7 @@ export class GameState {
   update(player: 0 | 1, move: number) {
     // respond to player move
     // probably want to change these to reflect the size of the paddles
-    console.log(`player ${player} attempted a move of ${move}`);
+    // console.log(`player ${player} attempted a move of ${move}`);
     if (player === 0) {
       if (this.playerOnePos + move - this.#paddleReach >= 0 && this.playerOnePos + move + this.#paddleReach <= this.#x - 1) {
         this.playerOnePos += move;
@@ -153,7 +153,8 @@ export class GameState {
       this.#ballPosActual[1] < this.#paddleElevation + 2) {
       if (this.#ballPosActual[0] >= this.playerOnePos - this.#paddleReach &&
         this.#ballPosActual[0] <= this.playerOnePos + this.#paddleReach) {
-        this.bounceDir('horiz')
+        this.bounceDir('horiz');
+        this.randomnizeDir(20);
       }
     }
 
@@ -162,7 +163,8 @@ export class GameState {
       this.#ballPosActual[1] > this.#y - 1 - this.#paddleElevation - 2) {
       if (this.#ballPosActual[0] >= this.playerTwoPos - this.#paddleReach &&
         this.#ballPosActual[0] <= this.playerTwoPos + this.#paddleReach) {
-        this.bounceDir('horiz')
+        this.bounceDir('horiz');
+        this.randomnizeDir(20);
       }
     }
 
