@@ -121,6 +121,7 @@ export class GameState {
   update(player: 0 | 1, move: number) {
     // respond to player move
     // probably want to change these to reflect the size of the paddles
+    console.log(`player ${player} attempted a move of ${move}`);
     if (player === 0) {
       if (this.playerOnePos + move - this.#paddleReach >= 0 && this.playerOnePos + move + this.#paddleReach <= this.#x - 1) {
         this.playerOnePos += move;

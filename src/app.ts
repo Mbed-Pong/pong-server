@@ -85,8 +85,12 @@ server.on('message', (msg, rinfo) => {
         break;
       case 'move':
         let lobby = lobbies.get(json.hash);
-        if (lobby === undefined) return;
+        if (lobby === undefined) {
+          console.log('lobby not found at hash');
+          return;
+        }
         lobby.gameState.update(json.player, json.delta);
+        console.log('updated positions');
         break;
     }
   } catch (e) {
