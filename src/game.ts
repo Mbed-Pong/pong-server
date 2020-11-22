@@ -27,6 +27,11 @@ type GameStateOptions = {
   ballSpeed?: number;
 
   /**
+   * have the ball speed up each time it hits a wall
+   */
+  wallAccel?: number;
+
+  /**
    * size of the paddles (in pixels) should be odd
    */
   paddleSize?: number;
@@ -48,8 +53,10 @@ export class GameState {
   #x: number;
   #y: number;
   #pointsToWin: number;
+  #wallAccel: number;
   #paddleReach: number;
   #paddleElevation: number;
+  #numBounces: number;
   // public
   ballPos: [number, number];
   score: [number, number];
@@ -77,8 +84,10 @@ export class GameState {
     this.#ballSpeed = options.ballSpeed || .8;
     this.#ballDir = [0, 1];
     this.#ballPosActual = [options.width / 2 - 1, options.height / 2 - 1];
+    this.#wallAccel = options.wallAccel || .2;
     this.#paddleReach = options.paddleSize ? Math.floor(options.paddleSize / 2) : 15;
     this.#paddleElevation = options.paddleElevation || 5;
+    this.#numBounces = 0;
 
     this.playerOnePos = options.height / 2 - 1;
     this.playerTwoPos = options.height / 2 - 1;
@@ -92,7 +101,7 @@ export class GameState {
 
   private set ballPosActual(position: [number, number]) {
     this.#ballPosActual = position;
-    this.ballPos = [Math.round(position[0]), Math.round(position[1])]
+    this.ballPos = [Math.round(position[0]), Math.round(position[1])];
   }
 
   private resetBall() {
@@ -140,11 +149,15 @@ export class GameState {
   tickForward() {
     // console.log("hello world")
     // move the ball
-    this.ballPosActual = [this.#ballPosActual[0] + this.#ballDir[0] * this.#ballSpeed, this.#ballPosActual[1] + this.#ballDir[1] * this.#ballSpeed];
+    this.ballPosActual = [
+      this.#ballPosActual[0] + this.#ballDir[0] * this.#ballSpeed + this.#numBounces * this.#wallAccel,
+      this.#ballPosActual[1] + this.#ballDir[1] * this.#ballSpeed + this.#numBounces * this.#wallAccel
+    ];
 
     // check for wall bounce
     if (this.#ballPosActual[0] <= 0 || this.#ballPosActual[0] >= this.#x - 1) {
       this.bounceDir('vert');
+      this.#numBounces++;
     }
 
     // check for paddle bounce
@@ -155,6 +168,7 @@ export class GameState {
         this.#ballPosActual[0] <= this.playerOnePos + this.#paddleReach) {
         this.bounceDir('horiz');
         this.randomnizeDir(20);
+        this.#numBounces = 0;
       }
     }
 
@@ -165,6 +179,7 @@ export class GameState {
         this.#ballPosActual[0] <= this.playerTwoPos + this.#paddleReach) {
         this.bounceDir('horiz');
         this.randomnizeDir(20);
+        this.#numBounces = 0;
       }
     }
 
