@@ -9,7 +9,7 @@ const port = process.env.PORT;
 const MAX_LOBBIES = 5;
 const TICK_TIME = 20;
 
-let lobbies:Map<string, Lobby> = new Map();
+let lobbies: Map<string, Lobby> = new Map();
 
 type Message = {
   type: 'connected';
@@ -44,10 +44,10 @@ server.on('message', (msg, rinfo) => {
           } else {
             // create new lobby and hash
             let hash = "jaredyeagersflipflop";
-            lobbies.set(hash, { 
-              numPlayers: 1, 
-              net: [{ addr: rinfo.address, port: rinfo.port }], 
-              gameState: new GameState({height: 128, width: 128, pointsToWin: 5}),
+            lobbies.set(hash, {
+              numPlayers: 1,
+              net: [{ addr: rinfo.address, port: rinfo.port }],
+              gameState: new GameState({ height: 128, width: 128, pointsToWin: 5 }),
             });
             server.send(JSON.stringify({ type: 'connected', player: 0, hash: hash }), rinfo.port, rinfo.address);
           }
@@ -72,14 +72,17 @@ server.on('message', (msg, rinfo) => {
                   console.log('lobby is undefined');
                   return;
                 }
-                server.send(JSON.stringify({type: 'gameState', gameState: lobby.gameState}), netinfo.port, netinfo.addr);
+                server.send(JSON.stringify({ type: 'gameState', gameState: lobby.gameState }), netinfo.port, netinfo.addr);
                 // console.log("Sending game state to player " + player);
               })
             };
             console.log('setting ticker...');
             lobby.ticker = setInterval(() => { lobby && lobby.gameState.tickForward() }, TICK_TIME);
             console.log('setting onEnd...');
-            lobby.gameState.onEnd = () => { lobby?.ticker && clearInterval(lobby.ticker) };
+            lobby.gameState.onEnd = () => {
+              lobby?.ticker && clearInterval(lobby.ticker)
+              found && lobbies.delete(found);
+            };
           }
         }
         break;
