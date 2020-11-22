@@ -151,8 +151,8 @@ export class GameState {
     // console.log("hello world")
     // move the ball
     this.ballPosActual = [
-      this.#ballPosActual[0] + this.#ballDir[0] * this.#ballSpeed + this.#numBounces * this.#wallAccel,
-      this.#ballPosActual[1] + this.#ballDir[1] * this.#ballSpeed + this.#numBounces * this.#wallAccel
+      this.#ballPosActual[0] + this.#ballDir[0] * (this.#ballSpeed + this.#numBounces * this.#wallAccel),
+      this.#ballPosActual[1] + this.#ballDir[1] * (this.#ballSpeed + this.#numBounces * this.#wallAccel)
     ];
 
     // check for wall bounce
