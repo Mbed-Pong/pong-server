@@ -107,6 +107,7 @@ export class GameState {
   private resetBall() {
     this.ballPosActual = [this.#x / 2 - 1, this.#y / 2 - 1];
     this.randomnizeDir(180);
+    this.#numBounces = 0;
   }
 
   private randomnizeDir(range: number) {
