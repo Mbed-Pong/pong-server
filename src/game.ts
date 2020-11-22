@@ -110,7 +110,7 @@ export class GameState {
     this.#numBounces = 0;
   }
 
-  private randomnizeDir(max: number, min: number, flipY: boolean) {
+  private randomnizeDir(max: number, min: number, flipY?: boolean) {
     let currAngle = Math.atan2(this.#ballDir[1], this.#ballDir[0]) * 180 / Math.PI;
     let randAngle = (Math.floor(Math.random() * (currAngle + max + 1)) + min) * Math.PI / 180;
     if (!flipY) {
@@ -178,7 +178,7 @@ export class GameState {
       if (this.#ballPosActual[0] >= this.playerOnePos - this.#paddleReach &&
         this.#ballPosActual[0] <= this.playerOnePos + this.#paddleReach) {
         this.bounceDir('horiz');
-        this.randomnizeDir(10);
+        this.randomnizeDir(20, 10);
         this.#numBounces = 0;
       }
     }
@@ -189,7 +189,7 @@ export class GameState {
       if (this.#ballPosActual[0] >= this.playerTwoPos - this.#paddleReach &&
         this.#ballPosActual[0] <= this.playerTwoPos + this.#paddleReach) {
         this.bounceDir('horiz');
-        this.randomnizeDir(10);
+        this.randomnizeDir(20, 10);
         this.#numBounces = 0;
       }
     }
