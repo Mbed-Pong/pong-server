@@ -18,6 +18,9 @@ type Message = {
   hash: string;
   player: 0 | 1;
   delta: number;
+} | {
+  type: 'disconnect';
+  hash: string;
 }
 
 server.on('error', (err) => {
@@ -78,21 +81,11 @@ server.on('message', (msg, rinfo) => {
             };
             console.log('setting ticker...');
             lobby.ticker = setInterval(() => { lobby && lobby.gameState.tickForward() }, TICK_TIME);
-            console.log('setting onEnd...');
-            lobby.gameState.onEnd = () => {
-              lobby?.ticker && clearInterval(lobby.ticker);
-              for (let i = 0; i < 5; ++i) {
-                lobby && lobby.net.map((netinfo, player) => {
-                  if (lobby === undefined) {
-                    console.log('lobby is undefined');
-                    return;
-                  }
-                  server.send(JSON.stringify({ type: 'gameState', gameState: lobby.gameState }), netinfo.port, netinfo.addr);
-                  // console.log("Sending game state to player " + player);
-                })
-              }
-              found && lobbies.delete(found);
-            };
+            // console.log('setting onEnd...');
+            // lobby.gameState.onEnd = () => {
+            //   lobby?.ticker && clearInterval(lobby.ticker);
+            //   found && lobbies.delete(found);
+            // };
           }
         }
         break;
@@ -104,6 +97,15 @@ server.on('message', (msg, rinfo) => {
         }
         lobby.gameState.update(json.player, json.delta);
         // console.log('updated positions');
+        break;
+      case 'disconnect':
+        lobby = lobbies.get(json.hash);
+        if (lobby === undefined) {
+          console.log('lobby')
+          return;
+        }
+        lobby.ticker && clearInterval(lobby.ticker);
+        // lobbies.delete(json.hash);
         break;
     }
   } catch (e) {

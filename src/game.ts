@@ -213,11 +213,11 @@ export class GameState {
     }
 
     // check for game over
-    if (this.isOver) {
-      this.onEnd();
-    } else {
-      this.onTickForward();
-    }
+    // if (this.isOver) {
+    //   this.onEnd();
+    // } else {
+    this.onTickForward();
+    // }
     console.log(JSON.stringify(this));
   };
 
