@@ -159,11 +159,6 @@ export class GameState {
    */
   tickForward() {
     // console.log("hello world")
-    // move the ball
-    this.ballPosActual = [
-      this.#ballPosActual[0] + this.#ballDir[0] * (this.#ballSpeed + this.#numBounces * this.#wallAccel),
-      this.#ballPosActual[1] + this.#ballDir[1] * (this.#ballSpeed + this.#numBounces * this.#wallAccel)
-    ];
 
     // check for wall bounce
     if (this.#ballPosActual[0] <= 0 || this.#ballPosActual[0] >= this.#x - 1) {
@@ -193,6 +188,12 @@ export class GameState {
         this.#numBounces = 0;
       }
     }
+
+    // move the ball
+    this.ballPosActual = [
+      this.#ballPosActual[0] + this.#ballDir[0] * (this.#ballSpeed + this.#numBounces * this.#wallAccel),
+      this.#ballPosActual[1] + this.#ballDir[1] * (this.#ballSpeed + this.#numBounces * this.#wallAccel)
+    ];
 
     // player 2 scores
     if (this.#ballPosActual[1] <= 0) {

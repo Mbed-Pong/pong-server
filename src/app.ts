@@ -80,7 +80,17 @@ server.on('message', (msg, rinfo) => {
             lobby.ticker = setInterval(() => { lobby && lobby.gameState.tickForward() }, TICK_TIME);
             console.log('setting onEnd...');
             lobby.gameState.onEnd = () => {
-              lobby?.ticker && clearInterval(lobby.ticker)
+              lobby?.ticker && clearInterval(lobby.ticker);
+              for (let i = 0; i < 5; ++i) {
+                lobby && lobby.net.map((netinfo, player) => {
+                  if (lobby === undefined) {
+                    console.log('lobby is undefined');
+                    return;
+                  }
+                  server.send(JSON.stringify({ type: 'gameState', gameState: lobby.gameState }), netinfo.port, netinfo.addr);
+                  // console.log("Sending game state to player " + player);
+                })
+              }
               found && lobbies.delete(found);
             };
           }
