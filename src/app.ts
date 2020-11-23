@@ -99,12 +99,12 @@ server.on('message', (msg, rinfo) => {
         // console.log('updated positions');
         break;
       case 'disconnect':
-        lobby = lobbies.get(json.hash);
-        if (lobby === undefined) {
-          console.log('lobby')
+        let testLobby = lobbies.get(json.hash);
+        if (testLobby === undefined) {
+          console.log('lobby not found at hash')
           return;
         }
-        lobby.ticker && clearInterval(lobby.ticker);
+        testLobby.ticker && clearInterval(testLobby.ticker);
         // lobbies.delete(json.hash);
         break;
     }
