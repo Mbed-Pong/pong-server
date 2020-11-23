@@ -38,6 +38,7 @@ server.on('message', (msg, rinfo) => {
   console.log(msg.toString());
   try {
     const json: Message = JSON.parse(msg.toString());
+    let lobby;
     switch (json.type) {
       case 'connected':
         let found = findAvailableLobby(lobbies);
@@ -90,7 +91,7 @@ server.on('message', (msg, rinfo) => {
         }
         break;
       case 'move':
-        let lobby = lobbies.get(json.hash);
+        lobby = lobbies.get(json.hash);
         if (lobby === undefined) {
           console.log('lobby not found at hash');
           return;
@@ -99,12 +100,15 @@ server.on('message', (msg, rinfo) => {
         // console.log('updated positions');
         break;
       case 'disconnect':
-        let testLobby = lobbies.get(json.hash);
-        if (testLobby === undefined) {
+        lobby = lobbies.get(json.hash);
+        if (lobby === undefined) {
           console.log('lobby not found at hash')
           return;
         }
-        testLobby.ticker && clearInterval(testLobby.ticker);
+        lobby.net.filter((value) => value.addr !== rinfo.address)
+        if (lobby.net.length === 0) {
+          lobby.ticker && clearInterval(lobby.ticker);
+        }
         // lobbies.delete(json.hash);
         break;
     }
