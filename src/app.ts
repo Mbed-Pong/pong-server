@@ -7,7 +7,7 @@ const server = dgram.createSocket('udp4');
 const port = process.env.PORT;
 
 const MAX_LOBBIES = 5;
-const TICK_TIME = 20;
+export const TICK_TIME = 20;
 
 let lobbies: Map<string, Lobby> = new Map();
 
@@ -106,10 +106,11 @@ server.on('message', (msg, rinfo) => {
           return;
         }
         lobby.net.filter((value) => value.addr !== rinfo.address)
-        if (lobby.net.length === 0) {
+        lobby.numPlayers = lobby.net.length;
+        if (lobby.numPlayers === 0) {
+          console.log('both players have disconnected: stoping ticking... ')
           lobby.ticker && clearInterval(lobby.ticker);
         }
-        // lobbies.delete(json.hash);
         break;
     }
   } catch (e) {

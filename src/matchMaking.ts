@@ -1,13 +1,13 @@
 import { GameState } from "./game";
 
 export type Lobby = {
-  numPlayers: 0 | 1 | 2;
+  numPlayers: number;
   gameState: GameState;
-  net: {addr: string, port: number}[];
+  net: { addr: string, port: number }[];
   ticker?: NodeJS.Timeout;
 }
 
-export const findAvailableLobby = (lobbies: Map<string, Lobby>):null | string => {
+export const findAvailableLobby = (lobbies: Map<string, Lobby>): null | string => {
   let foundKey = null;
   lobbies.forEach((lobby, key) => {
     let playersInLobby = lobby.numPlayers;
