@@ -105,7 +105,7 @@ server.on('message', (msg, rinfo) => {
           console.log('lobby not found at hash')
           return;
         }
-        lobby.net.filter((value) => value.addr !== rinfo.address)
+        lobby.net = lobby.net.filter((value) => value.addr !== rinfo.address);
         lobby.numPlayers = lobby.net.length;
         if (lobby.numPlayers === 0) {
           console.log('both players have disconnected: stoping ticking... ')
