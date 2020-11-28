@@ -102,7 +102,7 @@ export class GameState {
     this.ballPos = [options.width / 2 - 1, options.height / 2 - 1];
     this.score = [0, 0];
     this.isOver = 0;
-    this.countdown = options.countdown || 3000;
+    this.countdown = options.countdown || 3240;
 
     this.onEnd = () => { };
     this.onTickForward = () => { };
@@ -121,15 +121,16 @@ export class GameState {
 
   private randomnizeDir(max: number, min: number, flipY?: boolean) {
     let currAngle = Math.atan2(this.#ballDir[1], this.#ballDir[0]) * 180 / Math.PI;
-    let randAngle = (Math.floor(Math.random() * (currAngle + max + 1)) + min) * Math.PI / 180;
+    let randAug = (Math.floor(Math.random() * (max - min + 1)) + min) * (Math.round(Math.random()) * 2 - 1);
+    let randAngle = (currAngle + randAug) * Math.PI / 180;
     if (!flipY) {
       this.#ballDir = [
-        (Math.round(Math.random()) * 2 - 1) * Math.cos(randAngle),
+        Math.cos(randAngle),
         Math.sin(randAngle)
       ];
     } else {
       this.#ballDir = [
-        (Math.round(Math.random()) * 2 - 1) * Math.cos(randAngle),
+        Math.cos(randAngle),
         (Math.round(Math.random()) * 2 - 1) * Math.sin(randAngle)
       ];
     }
