@@ -225,9 +225,9 @@ export class GameState {
       // if (this.isOver) {
       //   this.onEnd();
       // } else {
-      this.onTickForward();
       // }
     }
+    this.onTickForward();
     console.log(JSON.stringify(this));
   };
 

@@ -54,6 +54,7 @@ server.on('message', (msg, rinfo) => {
               gameState: new GameState({ height: 128, width: 128, pointsToWin: 5 }),
             });
             server.send(JSON.stringify({ type: 'connected', player: 0, hash: hash }), rinfo.port, rinfo.address);
+            server.send(JSON.stringify({ type: 'waiting' }), rinfo.port, rinfo.address);
           }
         } else {
           let lobby = lobbies.get(found);
@@ -108,7 +109,7 @@ server.on('message', (msg, rinfo) => {
         lobby.net = lobby.net.filter((value) => value.addr !== rinfo.address);
         lobby.numPlayers = lobby.net.length;
         if (lobby.numPlayers === 0) {
-          console.log('both players have disconnected: stoping ticking... ')
+          console.log('both players have disconnected: stopping ticking... ')
           lobby.ticker && clearInterval(lobby.ticker);
         }
         break;
