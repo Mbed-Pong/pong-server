@@ -44,7 +44,7 @@ server.on('message', (msg, rinfo) => {
         let found = findAvailableLobby(lobbies);
         if (found === null) {
           if (lobbies.size >= MAX_LOBBIES) {
-            // respond that lobbies are full
+            // lobbies are full
           } else {
             // create new lobby and hash
             let hash = "jaredyeagersflipflop";
@@ -60,7 +60,6 @@ server.on('message', (msg, rinfo) => {
           let lobby = lobbies.get(found);
           if (!lobby) {
             console.log('lobby does not exist')
-            // lobby doesn't exist
             return;
           }
           lobby.numPlayers++;
@@ -69,7 +68,6 @@ server.on('message', (msg, rinfo) => {
           server.send(JSON.stringify({ type: 'connected', player: 1, hash: found }), rinfo.port, rinfo.address);
           if (lobby.numPlayers === 2) {
             // start game and send gamestate to both players
-            // need to come up with a way to clear the interval
             console.log('setting onTickForward()...');
             lobby.gameState.onTickForward = () => {
               lobby && lobby.net.map((netinfo, player) => {
@@ -83,11 +81,6 @@ server.on('message', (msg, rinfo) => {
             };
             console.log('setting ticker...');
             lobby.ticker = setInterval(() => { lobby && lobby.gameState.tickForward() }, TICK_TIME);
-            // console.log('setting onEnd...');
-            // lobby.gameState.onEnd = () => {
-            //   lobby?.ticker && clearInterval(lobby.ticker);
-            //   found && lobbies.delete(found);
-            // };
           }
         }
         break;

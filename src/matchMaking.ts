@@ -14,6 +14,7 @@ export const findAvailableLobby = (lobbies: Map<string, Lobby>): null | string =
     if (playersInLobby === 1) {
       foundKey = key;
     } else if (playersInLobby === 0) {
+      // clean up empty lobbies
       lobbies.delete(key);
     }
   });
